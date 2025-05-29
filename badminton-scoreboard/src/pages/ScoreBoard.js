@@ -1,115 +1,132 @@
-// function ScoreBoard() {
-//     return ( 
-//         <h1>
-//             hello world
-//         </h1>
-//      );
-// }
-
-// export default ScoreBoard;
-
-import React from 'react';
-import { useState, useEffect, useRef } from 'react';
-
-import { useLocation, useNavigate } from "react-router-dom";
-
-import axios from 'axios';
-
+// ScoreBoard.js
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import axios from "axios";
 
 export default function ScoreBoard() {
+  const navigate = useNavigate();
   const location = useLocation();
-  const { team1, team2 } = location.state;
+  const { team1, team2, referee } = location.state || {};
+
   const [score1, setScore1] = useState(0);
   const [score2, setScore2] = useState(0);
+  const [history, setHistory] = useState([]);
   const [timer, setTimer] = useState(0);
   const [running, setRunning] = useState(false);
-  const [history, setHistory] = useState([]);
-  const [undoAvailable, setUndoAvailable] = useState(false);
+  const [startTime, setStartTime] = useState(null);
+  const [endTime, setEndTime] = useState(null);
 
-  const navigate = useNavigate();
+  const intervalRef = useRef(null);
 
   useEffect(() => {
-    let interval;
     if (running) {
-      interval = setInterval(() => setTimer(t => t + 1), 1000);
+      intervalRef.current = setInterval(() => {
+        setTimer(prev => prev + 1);
+      }, 1000);
+    } else {
+      clearInterval(intervalRef.current);
     }
-    return () => clearInterval(interval);
+    return () => clearInterval(intervalRef.current);
   }, [running]);
 
-  const handleStart = () => setRunning(true);
+  const formatTime = (seconds) => {
+    const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const secs = String(seconds % 60).padStart(2, '0');
+    return `${mins} : ${secs}`;
+  };
 
-  const handleScore = team => {
+  const handleScore = (team) => {
     if (!running) return;
+    const newHistory = [...history];
     if (team === 1 && score1 < 30) {
-      setHistory([{ team: 1, score: score1 }, ...history]);
+      newHistory.push({ team: 1, prev: score1 });
       setScore1(score1 + 1);
-      setUndoAvailable(true);
-    }
-    if (team === 2 && score2 < 30) {
-      setHistory([{ team: 2, score: score2 }, ...history]);
+    } else if (team === 2 && score2 < 30) {
+      newHistory.push({ team: 2, prev: score2 });
       setScore2(score2 + 1);
-      setUndoAvailable(true);
     }
+    setHistory(newHistory);
   };
 
   const handleUndo = () => {
-    if (!undoAvailable || history.length === 0) return;
-    const last = history[0];
-    if (last.team === 1) setScore1(last.score);
-    if (last.team === 2) setScore2(last.score);
-    setHistory(history.slice(1));
-    setUndoAvailable(false);
+    const last = history.pop();
+    if (!last) return;
+    if (last.team === 1) setScore1(last.prev);
+    else setScore2(last.prev);
+    setHistory([...history]);
   };
 
   const checkWinner = () => {
-    if (score1 >= 21 && score1 - score2 >= 2) return 1;
-    if (score2 >= 21 && score2 - score1 >= 2) return 2;
-    if (score1 === 30) return 1;
-    if (score2 === 30) return 2;
-    return 0;
+    if ((score1 >= 21 && score1 - score2 >= 2) || score1 === 30) return team1;
+    if ((score2 >= 21 && score2 - score1 >= 2) || score2 === 30) return team2;
+    return null;
+  };
+
+  const handleStart = () => {
+    setRunning(true);
+    setStartTime(new Date());
+  };
+
+  const handleFinish = async () => {
+    setRunning(false);
+    const end = new Date();
+    setEndTime(end);
+    const winner = checkWinner();
+    const matchData = {
+      team1,
+      team2,
+      referee,
+      team1Score: score1,
+      team2Score: score2,
+      winner,
+      startTime,
+      endTime: end,
+      duration: formatTime(timer),
+    };
+    try {
+      await axios.post("http://localhost:5000/api/matches", matchData);
+    } catch (err) {
+      console.error("Error saving match:", err);
+    }
+    navigate("/");
   };
 
   const winner = checkWinner();
 
-  const handleFinish = () => navigate("/");
-
-  const formatTime = seconds => `${String(Math.floor(seconds / 60)).padStart(2, '0')} : ${String(seconds % 60).padStart(2, '0')}`;
-
-
-const saveMatch = async (matchData) => {
-  try {
-    const res = await axios.post('http://localhost:5000/api/matches', matchData);
-    console.log('Match saved:', res.data);
-  } catch (err) {
-    console.error('Error saving match:', err);
-  }
-};
-
   return (
-    <div className="text-center p-8">
-      <h1 className="text-2xl font-bold mb-4">Badminton ScoreBoard</h1>
-      <div className="mb-4">Time: {formatTime(timer)}</div>
-      <div className="flex justify-center items-center space-x-8 mb-6">
+    <div>
+      <h1>Badminton ScoreBoard</h1>
+      <p>Time: {formatTime(timer)}</p>
+      <p>Time: {timer}</p>
+      <div>
         <div>
-          <div className="text-3xl font-bold">{team1}</div>
-          <div className={`text-6xl p-6 rounded ${winner === 1 ? 'bg-green-200' : winner === 2 ? 'bg-gray-200' : 'bg-gray-50'} cursor-pointer`} onClick={() => handleScore(1)}>{score1}</div>
+          <h2>Team 1</h2>
+          <div
+            style={{ background: winner === team1 ? 'lightgreen' : score1 >= 21 && winner !== team1 ? 'lightgray' : 'white' }}
+            onClick={() => handleScore(1)}
+          >
+            {score1}
+          </div>
         </div>
-        <div className="text-4xl">:</div>
+        <span>:</span>
         <div>
-          <div className="text-3xl font-bold">{team2}</div>
-          <div className={`text-6xl p-6 rounded ${winner === 2 ? 'bg-green-200' : winner === 1 ? 'bg-gray-200' : 'bg-gray-50'} cursor-pointer`} onClick={() => handleScore(2)}>{score2}</div>
+          <h2>Team 2</h2>
+          <div
+            style={{ background: winner === team2 ? 'lightgreen' : score2 >= 21 && winner !== team2 ? 'lightgray' : 'white' }}
+            onClick={() => handleScore(2)}
+          >
+            {score2}
+          </div>
         </div>
       </div>
-      {!running && winner === 0 ? (
-        <button onClick={handleStart} className="px-4 py-2 bg-green-700 text-white rounded">Start</button>
-      ) : winner ? (
-        <button onClick={handleFinish} className="px-4 py-2 bg-red-600 text-white rounded">Finish</button>
-      ) : (
-        <div className="space-x-4">
-          <button onClick={() => setRunning(false)} className="px-4 py-2 bg-yellow-500 text-white rounded">Pause</button>
-          <button onClick={handleUndo} disabled={!undoAvailable} className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50">Undo</button>
-        </div>
+      {!running && !winner && <button onClick={handleStart}>Start</button>}
+      {running && !winner && (
+        <>
+          <button onClick={() => setRunning(false)}>Pause</button>
+          <button onClick={handleUndo}>Undo</button>
+        </>
       )}
+      {winner && <button onClick={handleFinish}>Finish</button>}
     </div>
   );
 }
