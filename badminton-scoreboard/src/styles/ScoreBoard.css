@@ -1,0 +1,97 @@
+
+.scoreboard-container {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  padding: 2rem;
+}
+
+.scoreboard-title {
+  color: darkgreen;
+  font-weight: 600;
+}
+
+.scoreboard-timer {
+  font-size: 1.2rem;
+  margin: 1rem 0;
+}
+
+.scoreboard-divider {
+  margin: 1rem auto;
+  width: 80%;
+}
+
+.scoreboard-score-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.scoreboard-team-block {
+  text-align: center;
+}
+
+.scoreboard-team-title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.scoreboard-team-name {
+  font-size: 1rem;
+  color: #333;
+}
+
+.scoreboard-score-card {
+  width: 100px;
+  height: 100px;
+  background-color: #f9f9f4;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.scoreboard-colon {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.scoreboard-button-container {
+  margin-top: 2rem;
+}
+
+.scoreboard-button {
+  background-color: darkgreen;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 0 0.5rem;
+}
+
+.undo-button {
+  padding: 10px 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.undo-button.active {
+  background-color: #4caf50; /* green */
+  color: white;
+}
+
+.undo-button.inactive {
+  background-color: #ccc; /* gray */
+  color: #666;
+  cursor: not-allowed;
+}

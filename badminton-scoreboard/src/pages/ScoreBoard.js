@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import "../styles/ScoreBoard.css";
+
 
 export default function ScoreBoard() {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ export default function ScoreBoard() {
   const [running, setRunning] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
+  const [canUndo, setCanUndo] = useState(false);
 
   const intervalRef = useRef(null);
 
@@ -38,6 +41,7 @@ export default function ScoreBoard() {
   const handleScore = (team) => {
     if (!running) return;
     const newHistory = [...history];
+
     if (team === 1 && score1 < 30) {
       newHistory.push({ team: 1, prev: score1 });
       setScore1(score1 + 1);
@@ -45,16 +49,24 @@ export default function ScoreBoard() {
       newHistory.push({ team: 2, prev: score2 });
       setScore2(score2 + 1);
     }
+
     setHistory(newHistory);
+    setCanUndo(true); // Enable Undo after a valid score
   };
 
+
   const handleUndo = () => {
+    if (!canUndo) return;
     const last = history.pop();
     if (!last) return;
+
     if (last.team === 1) setScore1(last.prev);
     else setScore2(last.prev);
+
     setHistory([...history]);
+    setCanUndo(false); // Disable Undo after one use
   };
+
 
   const checkWinner = () => {
     if ((score1 >= 21 && score1 - score2 >= 2) || score1 === 30) return team1;
@@ -94,39 +106,56 @@ export default function ScoreBoard() {
   const winner = checkWinner();
 
   return (
-    <div>
-      <h1>Badminton ScoreBoard</h1>
-      <p>Time: {formatTime(timer)}</p>
-      <p>Time: {timer}</p>
-      <div>
-        <div>
-          <h2>Team 1</h2>
-          <div
-            style={{ background: winner === team1 ? 'lightgreen' : score1 >= 21 && winner !== team1 ? 'lightgray' : 'white' }}
-            onClick={() => handleScore(1)}
-          >
-            {score1}
-          </div>
-        </div>
-        <span>:</span>
-        <div>
-          <h2>Team 2</h2>
-          <div
-            style={{ background: winner === team2 ? 'lightgreen' : score2 >= 21 && winner !== team2 ? 'lightgray' : 'white' }}
-            onClick={() => handleScore(2)}
-          >
-            {score2}
-          </div>
-        </div>
+  <div className="scoreboard-container">
+    <h1 className="scoreboard-title">Badminton ScoreBoard</h1>
+    <p className="scoreboard-timer">Time: {formatTime(timer)}</p>
+    <p className="scoreboard-timer">Referee: {referee}</p>
+    <hr className="scoreboard-divider" />
+
+    <div className="scoreboard-score-row">
+      <div className="scoreboard-team-block">
+        <h2 className="scoreboard-team-title">Team 1</h2>
+        <p className="scoreboard-team-name">{team1}</p>
       </div>
-      {!running && !winner && <button onClick={handleStart}>Start</button>}
+
+      <div className="scoreboard-score-card" onClick={() => handleScore(1)}>
+        <span>{score1}</span>
+      </div>
+
+      <div className="scoreboard-colon">:</div>
+
+      <div className="scoreboard-score-card" onClick={() => handleScore(2)}>
+        <span>{score2}</span>
+      </div>
+
+      <div className="scoreboard-team-block">
+        <h2 className="scoreboard-team-title">Team 2</h2>
+        <p className="scoreboard-team-name">{team2}</p>
+      </div>
+    </div>
+
+    <div className="scoreboard-button-container">
+      {!running && !winner && (
+        <button className="scoreboard-button" onClick={handleStart}>Start</button>
+      )}
       {running && !winner && (
         <>
-          <button onClick={() => setRunning(false)}>Pause</button>
-          <button onClick={handleUndo}>Undo</button>
+          <button className="scoreboard-button" onClick={() => setRunning(false)}>Pause</button>
+          <button
+            className={`undo-button ${canUndo ? 'active' : 'inactive'}`}
+            onClick={handleUndo}
+            disabled={!canUndo}
+          >
+            Undo
+          </button>
         </>
       )}
-      {winner && <button onClick={handleFinish}>Finish</button>}
+      {winner && (
+        <button className="scoreboard-button" onClick={handleFinish}>Finish</button>
+      )}
     </div>
-  );
+  </div>
+);
+
+
 }
