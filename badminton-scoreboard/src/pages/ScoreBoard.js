@@ -13,6 +13,8 @@ import { useState, useEffect, useRef } from 'react';
 
 import { useLocation, useNavigate } from "react-router-dom";
 
+import axios from 'axios';
+
 
 export default function ScoreBoard() {
   const location = useLocation();
@@ -73,6 +75,16 @@ export default function ScoreBoard() {
 
   const formatTime = seconds => `${String(Math.floor(seconds / 60)).padStart(2, '0')} : ${String(seconds % 60).padStart(2, '0')}`;
 
+
+const saveMatch = async (matchData) => {
+  try {
+    const res = await axios.post('http://localhost:5000/api/matches', matchData);
+    console.log('Match saved:', res.data);
+  } catch (err) {
+    console.error('Error saving match:', err);
+  }
+};
+
   return (
     <div className="text-center p-8">
       <h1 className="text-2xl font-bold mb-4">Badminton ScoreBoard</h1>
@@ -88,7 +100,7 @@ export default function ScoreBoard() {
           <div className={`text-6xl p-6 rounded ${winner === 2 ? 'bg-green-200' : winner === 1 ? 'bg-gray-200' : 'bg-gray-50'} cursor-pointer`} onClick={() => handleScore(2)}>{score2}</div>
         </div>
       </div>
-      {/* {!running && winner === 0 ? (
+      {!running && winner === 0 ? (
         <button onClick={handleStart} className="px-4 py-2 bg-green-700 text-white rounded">Start</button>
       ) : winner ? (
         <button onClick={handleFinish} className="px-4 py-2 bg-red-600 text-white rounded">Finish</button>
@@ -97,7 +109,7 @@ export default function ScoreBoard() {
           <button onClick={() => setRunning(false)} className="px-4 py-2 bg-yellow-500 text-white rounded">Pause</button>
           <button onClick={handleUndo} disabled={!undoAvailable} className="px-4 py-2 bg-gray-700 text-white rounded disabled:opacity-50">Undo</button>
         </div>
-      )} */}
+      )}
     </div>
   );
 }
