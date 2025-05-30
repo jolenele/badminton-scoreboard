@@ -39,9 +39,8 @@ export default function ScoreBoard() {
   };
 
   const handleScore = (team) => {
-    if (!running) return;
+    if (!running || winner) return; // Prevent scoring if paused or winner exists
     const newHistory = [...history];
-
     if (team === 1 && score1 < 30) {
       newHistory.push({ team: 1, prev: score1 });
       setScore1(score1 + 1);
@@ -49,9 +48,8 @@ export default function ScoreBoard() {
       newHistory.push({ team: 2, prev: score2 });
       setScore2(score2 + 1);
     }
-
     setHistory(newHistory);
-    setCanUndo(true); // Enable Undo after a valid score
+    setCanUndo(true); // Re-enable Undo after scoring
   };
 
 
@@ -108,8 +106,11 @@ export default function ScoreBoard() {
   return (
   <div className="scoreboard-container">
     <h1 className="scoreboard-title">Badminton ScoreBoard</h1>
-    <p className="scoreboard-timer">Time: {formatTime(timer)}</p>
-    <p className="scoreboard-timer">Referee: {referee}</p>
+    <div className="scoreboard-info-row">
+      <p className="scoreboard-timer">Referee: {referee}</p>
+      <p className="scoreboard-timer">Time: {formatTime(timer)}</p>
+    </div>
+
     <hr className="scoreboard-divider" />
 
     <div className="scoreboard-score-row">

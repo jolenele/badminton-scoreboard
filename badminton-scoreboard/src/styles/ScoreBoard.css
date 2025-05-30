@@ -10,13 +10,25 @@
   font-weight: 600;
 }
 
-.scoreboard-timer {
-  font-size: 1.2rem;
-  margin: 1rem 0;
+/* .scoreboard-timer {
+  font-size: 0.5rem;
+  margin: 0.5rem 0;
+} */
+
+.scoreboard-info-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 1rem; /* optional spacing */
 }
 
+.scoreboard-timer {
+  margin: 0;
+}
+
+
 .scoreboard-divider {
-  margin: 1rem auto;
+  margin: 0.5rem auto;
   width: 80%;
 }
 
@@ -33,7 +45,7 @@
 }
 
 .scoreboard-team-title {
-  font-size: 2rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
