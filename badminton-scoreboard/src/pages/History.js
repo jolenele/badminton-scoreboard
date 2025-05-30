@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import "../styles/ScoreBoard.css";
 
 export default function History() {
   const [matches, setMatches] = useState([]);
@@ -14,18 +14,15 @@ export default function History() {
         console.error("Error fetching match history:", error);
       }
     }
-
     fetchMatches();
   }, []);
-  
-  const navigate = useNavigate();
 
   return (
-    <div>
-      <h1>Match History</h1>
-      <table border="1">
+    <div className="scoreboard-container">
+      <h1 className="scoreboard-title">Match History</h1>
+      <table style={{ width: "100%", marginTop: "1rem", borderCollapse: "collapse" }}>
         <thead>
-          <tr>
+          <tr style={{ backgroundColor: "#f0f0f0" }}>
             <th>Team 1</th>
             <th>Team 2</th>
             <th>Referee</th>
@@ -38,7 +35,7 @@ export default function History() {
         </thead>
         <tbody>
           {matches.map((match, index) => (
-            <tr key={index}>
+            <tr key={index} style={{ textAlign: "center", borderBottom: "1px solid #ddd" }}>
               <td>{match.team1}</td>
               <td>{match.team2}</td>
               <td>{match.referee}</td>
@@ -51,8 +48,6 @@ export default function History() {
           ))}
         </tbody>
       </table>
-            <button onClick={() => navigate("/")} className="px-6 py-2 bg-gray-700 text-white rounded">Home</button>
-
     </div>
   );
 }

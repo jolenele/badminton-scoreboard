@@ -1,14 +1,6 @@
-// function NewMatch() {
-//     return ( 
-//         <h1>New Match</h1>
-//      );
-// }
-
-// export default NewMatch;
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import "../styles/ScoreBoard.css";
 
 export default function NewMatch() {
   const [team1, setTeam1] = useState("");
@@ -23,11 +15,14 @@ export default function NewMatch() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-4">
-      <input className="border p-2" placeholder="Team 1" value={team1} onChange={e => setTeam1(e.target.value)} />
-      <input className="border p-2" placeholder="Team 2" value={team2} onChange={e => setTeam2(e.target.value)} />
-      <input className="border p-2" placeholder="Referee" value={referee} onChange={e => setReferee(e.target.value)} />
-      <button disabled={!team1 || !team2 || !referee} onClick={handleDone} className="px-4 py-2 bg-green-700 text-white rounded">Done</button>
+    <div className="scoreboard-container">
+      <h1 className="scoreboard-title">New Match</h1>
+      <div className="scoreboard-button-container" style={{ flexDirection: "column", gap: "1rem" }}>
+        <input className="scoreboard-team-name" placeholder="Team 1" value={team1} onChange={(e) => setTeam1(e.target.value)} />
+        <input className="scoreboard-team-name" placeholder="Team 2" value={team2} onChange={(e) => setTeam2(e.target.value)} />
+        <input className="scoreboard-team-name" placeholder="Referee" value={referee} onChange={(e) => setReferee(e.target.value)} />
+        <button className="scoreboard-button" onClick={handleDone} disabled={!team1 || !team2 || !referee}>Done</button>
+      </div>
     </div>
   );
 }
