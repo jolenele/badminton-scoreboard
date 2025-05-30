@@ -8,7 +8,7 @@ export default function History() {
   useEffect(() => {
     async function fetchMatches() {
       try {
-        const response = await axios.get("http://localhost:5000/api/matches");
+        const response = await axios.get("https://badminton-scoreboard.onrender.com/api/matches");
         setMatches(response.data);
       } catch (error) {
         console.error("Error fetching match history:", error);

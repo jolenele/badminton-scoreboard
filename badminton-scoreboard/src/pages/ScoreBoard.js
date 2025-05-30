@@ -94,7 +94,7 @@ export default function ScoreBoard() {
       duration: formatTime(timer),
     };
     try {
-      await axios.post("http://localhost:5000/api/matches", matchData);
+      await axios.post("https://badminton-scoreboard.onrender.com/api/matches", matchData);
     } catch (err) {
       console.error("Error saving match:", err);
     }
